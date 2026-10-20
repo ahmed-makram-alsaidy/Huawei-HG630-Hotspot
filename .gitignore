@@ -1,0 +1,9 @@
+Huawei_Arabic_System/data/db.json
+Huawei_Arabic_System/data/engine*.json
+Huawei_Arabic_System/data/auth.json
+Huawei_Arabic_System/data/history/
+Huawei_Arabic_System/data/*.txt
+install_engine_log.txt
+setup_nat_log.txt
+diag*.txt
+*.etl

@@ -1,0 +1,68 @@
+{
+ "portalConfig": {
+  "networkName": "Huawei High-Speed Wi-Fi",
+  "welcomeTitle": "تسجيل الدخول إلى الشبكة",
+  "welcomeSub": "أدخل كود الكارت أو بيانات المشترك للاتصال بالإنترنت",
+  "supportPhone": "",
+  "showPackages": true,
+  "showPrices": false,
+  "qosEnabled": true
+ },
+ "packages": [
+  {
+   "id": "basic",
+   "name": "الباقة الأساسية",
+   "speedDown": 2,
+   "speedUp": 1,
+   "quotaGB": 5,
+   "days": 7,
+   "price": "20 ج.م"
+  },
+  {
+   "id": "standard",
+   "name": "الباقة القياسية",
+   "speedDown": 5,
+   "speedUp": 2,
+   "quotaGB": 20,
+   "days": 30,
+   "price": "50 ج.م"
+  },
+  {
+   "id": "plus",
+   "name": "الباقة الفائقة",
+   "speedDown": 10,
+   "speedUp": 4,
+   "quotaGB": 50,
+   "days": 30,
+   "price": "100 ج.م"
+  },
+  {
+   "id": "vip",
+   "name": "باقة VIP مفتوحة",
+   "speedDown": 25,
+   "speedUp": 10,
+   "quotaGB": 0,
+   "days": 30,
+   "price": "180 ج.م"
+  }
+ ],
+ "vouchers": [],
+ "users": [
+  {
+   "id": "u1",
+   "fullName": "الأدمن",
+   "username": "admin1",
+   "password": "123456",
+   "packageId": "vip",
+   "packageName": "باقة VIP مفتوحة",
+   "speedDown": 25,
+   "speedUp": 10,
+   "quotaGB": 0,
+   "usedMB": 0,
+   "macLock": "",
+   "expiresAt": "2030-12-31",
+   "status": "active"
+  }
+ ],
+ "blockedMacs": []
+}
