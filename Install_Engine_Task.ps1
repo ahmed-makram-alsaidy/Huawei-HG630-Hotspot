@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Installs/updates the Gateway Enforcement Engine as an elevated auto-start scheduled task.
     Part of the Huawei HG630 Hotspot System installer.
@@ -32,6 +32,15 @@ try {
     Start-ScheduledTask -TaskName "Huawei_Gateway_Engine"
     Log "task started"
 } catch { Log "task registration failed: $($_.Exception.Message)" }
+
+# 4) watchdog task (every minute: auto-restart server/engine + daily backup)
+try {
+    $wdAction = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$PSScriptRoot\Watchdog.ps1`""
+    $wdTrigger = New-ScheduledTaskTrigger -Once -At (Get-Date).AddMinutes(1) -RepetitionInterval (New-TimeSpan -Minutes 1) -RepetitionDuration (New-TimeSpan -Days 3650)
+    Register-ScheduledTask -TaskName "Huawei_Hotspot_Watchdog" -Action $wdAction -Trigger $wdTrigger -Principal $principal -Description "Hotspot watchdog: auto-restart + daily backup" -Force | Out-Null
+    Start-ScheduledTask -TaskName "Huawei_Hotspot_Watchdog"
+    Log "watchdog task registered"
+} catch { Log "watchdog registration failed: $($_.Exception.Message)" }
 
 Start-Sleep -Seconds 6
 $e = Get-Content "$PSScriptRoot\Huawei_Arabic_System\data\engine.json" -Raw -ErrorAction SilentlyContinue | ConvertFrom-Json

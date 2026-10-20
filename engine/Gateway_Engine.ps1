@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Huawei HG630 Hotspot — Gateway Enforcement Engine (WinDivert-based)
     Runs ELEVATED. Captures all guest traffic (192.168.2.2-253) at the network layer and provides:
@@ -223,6 +223,29 @@ $ctrl = [powershell]::Create().AddScript({
                     }
                 } catch {}
             }
+
+            # ---- activity events (new devices, quota/expiry cutoffs) ----
+            try {
+                $actF = Join-Path $DataDir "activity_engine.json"
+                $alist = @()
+                if (Test-Path $actF) { try { $alist = @(([System.IO.File]::ReadAllText($actF) | ConvertFrom-Json)) } catch {} }
+                $changed = $false
+                foreach ($k in @($S.Sessions.Keys)) {
+                    $s2 = $S.Sessions[$k]
+                    if (-not $s2.notified) {
+                        $s2.notified = $true; $changed = $true
+                        $alist += @{ ts = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss"); kind = "device"; text = "جهاز جديد ظهر على الشبكة: $($s2.ip)" }
+                    }
+                    if (($s2.reason -eq "quota" -or $s2.reason -eq "expired" -or $s2.reason -eq "daily") -and -not $s2.warned) {
+                        $s2.warned = $true; $changed = $true
+                        $alist += @{ ts = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss"); kind = "cutoff"; text = "قُطع الاتصال ($($s2.reason)): $($s2.name) [$($s2.ip)]" }
+                    }
+                }
+                if ($changed) {
+                    if ($alist.Count -gt 50) { $alist = $alist[($alist.Count - 50)..($alist.Count - 1)] }
+                    [System.IO.File]::WriteAllText($actF, ($alist | ConvertTo-Json -Depth 5 -Compress))
+                }
+            } catch {}
 
             # ---- persist engine.json (heartbeat) ----
             if (($now.Ticks - $lastEngineWrite) -gt 30000000) {  # 3s

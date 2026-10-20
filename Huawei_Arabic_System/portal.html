@@ -332,7 +332,7 @@
       out.textContent = 'جاري القياس...';
       try {
         const t0 = performance.now();
-        const r = await fetch(`${API}/api/speedtest?kb=3072&v=${Date.now()}`, { cache: 'no-store' });
+        const r = await fetch(`${API}/api/speedtest-internet?kb=3072&v=${Date.now()}`, { cache: 'no-store' });
         const buf = await r.arrayBuffer();
         const secs = (performance.now() - t0) / 1000;
         const mbps = (buf.byteLength * 8) / secs / 1e6;
@@ -363,6 +363,12 @@
         }
       } catch {}
     }
+
+    // voucher code from QR scan (?code=)
+    try {
+      const urlCode = new URLSearchParams(location.search).get('code');
+      if (urlCode) { $('vCode').value = urlCode.trim(); setTimeout(() => { try { $('vCode').focus(); } catch(e){} }, 300); }
+    } catch {}
 
     loadPortalInfo();
     resumeIfConnected();
