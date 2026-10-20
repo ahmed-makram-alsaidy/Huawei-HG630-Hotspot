@@ -154,6 +154,10 @@ function Get-LiveRouterStatus {
             $lastWipe = $mObj.LastMonthlyWipe
         }
 
+        # gateway readiness (ICS + hotspot IP on the Ethernet adapter)
+        $ics = Get-Service SharedAccess -ErrorAction SilentlyContinue
+        $ethIps = ((Get-NetIPAddress -InterfaceIndex 8 -AddressFamily IPv4 -ErrorAction SilentlyContinue).IPAddress) -join ", "
+
         return @{
             ok = $true
             connected = $true
@@ -163,6 +167,7 @@ function Get-LiveRouterStatus {
             hosts = $hostList
             aclCount = @($acls).Count
             lastMonthlyWipe = $lastWipe
+            gateway = @{ ics = "$($ics.Status)"; ethIps = $ethIps }
         }
     } catch {
         return @{

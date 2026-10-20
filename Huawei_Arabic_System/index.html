@@ -135,7 +135,7 @@
     <div class="login-card">
       <div class="login-head">
         <h1>Huawei HG630 V2</h1>
-        <span>192.168.2.1 — لوحة تحكم الأدمن الكاملة</span>
+        <span>192.168.2.254 — لوحة تحكم الأدمن الكاملة</span>
       </div>
       <div class="login-body">
         <div class="login-error hidden" id="loginError">اسم المستخدم أو كلمة المرور غير صحيحة</div>
@@ -177,24 +177,34 @@
     <div class="tabs-wrap">
       <div class="container">
         <nav class="tabs" role="tablist">
-          <button class="tab" type="button" role="tab" aria-selected="true" data-tab="status">الحالة والأجهزة المتصلة</button>
-          <button class="tab" type="button" role="tab" aria-selected="false" data-tab="wifi">الواي فاي (4 شبكات + الراديو)</button>
-          <button class="tab" type="button" role="tab" aria-selected="false" data-tab="ports">منافذ السلك والـ DNS والسرعات</button>
-          <button class="tab" type="button" role="tab" aria-selected="false" data-tab="vouchers">إدارة الكروت</button>
+          <button class="tab" type="button" role="tab" aria-selected="true" data-tab="status">الرئيسية (الحالة والأجهزة)</button>
+          <button class="tab" type="button" role="tab" aria-selected="false" data-tab="wifi">الواي فاي</button>
+          <button class="tab" type="button" role="tab" aria-selected="false" data-tab="vouchers">الكروت</button>
           <button class="tab" type="button" role="tab" aria-selected="false" data-tab="users">المشتركين والباقات</button>
-          <button class="tab" type="button" role="tab" aria-selected="false" data-tab="system">تسريع الرامات والحماية والنظام</button>
-          <button class="tab" type="button" role="tab" aria-selected="false" data-tab="devices">الأجهزة الحية والقطع</button>
           <button class="tab" type="button" role="tab" aria-selected="false" data-tab="reports">التقارير والاستهلاك</button>
-          <button class="tab" type="button" role="tab" aria-selected="false" data-tab="protection">وقت النوم والحظر</button>
+          <button class="tab" type="button" role="tab" aria-selected="false" data-tab="system">الإعدادات والحماية</button>
         </nav>
       </div>
     </div>
 
     <main class="container">
+      <div id="engBanner" class="hidden" style="margin-bottom:14px;padding:12px 16px;border:1.5px solid var(--red-line);background:var(--red-bg);color:var(--red);border-radius:10px;font-weight:700;font-size:13.5px">
+        ⚠ محرك الحماية واقف — الأجهزة مش هتتقفل ولا الاستهلاك هيتعد. شغّل Install_Engine_Task.ps1 كمسؤول أو Start-ScheduledTask Huawei_Gateway_Engine
+      </div>
 
       <!-- TAB 1: Status & Connected Devices -->
       <section class="page active" id="status" role="tabpanel">
         <div class="stack">
+          <div class="panel" id="readyPanel">
+            <div class="panel-head"><h2>جاهزية النظام</h2></div>
+            <div class="panel-body">
+              <dl class="kv">
+                <div><dt>كونفيج الراوتر (على 192.168.2.254)</dt><dd id="readyRouter">—</dd></div>
+                <div><dt>بوابة الإنترنت (ICS على الكمبيوتر)</dt><dd id="readyGateway">—</dd></div>
+                <div><dt>محرك العدّاد والقطع</dt><dd id="readyEngine">—</dd></div>
+              </dl>
+            </div>
+          </div>
           <div class="four-col">
             <div class="stat-card"><span>الأجهزة المتصلة الآن</span><strong id="statHosts">1</strong></div>
             <div class="stat-card"><span>شبكات الواي فاي المفعلة</span><strong id="statActiveSsids">4 / 4</strong></div>
@@ -212,7 +222,7 @@
                   <div><dt>إصدار السوفتوير</dt><dd class="ltr" id="stSw">V100R001C36B023</dd></div>
                   <div><dt>إصدار الهاردوير</dt><dd class="ltr" id="stHw">VER.B</dd></div>
                   <div><dt>عنوان MAC</dt><dd class="ltr" id="stMac">8C:15:C7:EB:BF:2F</dd></div>
-                  <div><dt>عنوان IP للراوتر</dt><dd class="ltr" id="stIp">192.168.2.1</dd></div>
+                  <div><dt>عنوان IP للراوتر</dt><dd class="ltr" id="stIp">192.168.2.254</dd></div>
                   <div><dt>مدة التشغيل</dt><dd id="stUptime">—</dd></div>
                 </dl>
               </div>
@@ -283,7 +293,29 @@
               </table>
             </div>
           </section>
-        </div>
+  
+
+          <div class="panel">
+            <div class="panel-head"><h2>محرك الحماية (Enforcement Engine)</h2><span class="badge" id="engState">—</span></div>
+            <div class="panel-body">
+              <dl class="kv">
+                <div><dt>حالة المحرك</dt><dd id="engHeart">—</dd></div>
+                <div><dt>باكتس معالجة / مرفوضة / DNS محوّل للبورتال</dt><dd class="ltr" id="engStats">—</dd></div>
+                <div><dt>جدول وقت النوم</dt><dd id="engSched">—</dd></div>
+              </dl>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head"><h2>الأجهزة المتصلة (تحديث لحظي)</h2></div>
+            <div class="panel-body" style="padding:0;overflow-x:auto">
+              <table>
+                <thead><tr><th>الجهاز / الكارت</th><th>IP</th><th>MAC</th><th>استهلك (MB)</th><th>اليوم (MB)</th><th>الحالة</th><th>إجراءات</th></tr></thead>
+                <tbody id="devRows"><tr><td colspan="7">—</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+      </div>
       </section>
 
       <!-- TAB 2: Wi-Fi (4 Networks + Advanced Radio Controls) -->
@@ -587,206 +619,7 @@
       </section>
 
       <!-- TAB 3: Physical LAN Ports, Router DNS Blocker & 4 Hardware QoS Queues -->
-      <section class="page" id="ports" role="tabpanel" hidden>
-        <div class="stack">
-          <!-- 4 Physical LAN Ports -->
-          <section class="panel">
-            <div class="panel-head">
-              <h2>التحكم المباشر في منافذ السلك الـ 4 (Physical Ethernet Switch Ports)</h2>
-            </div>
-            <div class="panel-body">
-              <div class="four-col">
-                <div class="panel" style="padding:14px">
-                  <label class="check-row" for="lan1Enable" style="margin-bottom:10px">
-                    <span>منفذ LAN 1 (eth0.2)</span>
-                    <input id="lan1Enable" type="checkbox" checked>
-                  </label>
-                  <div class="fields">
-                    <div class="field">
-                      <label for="lan1Speed">تحديد سرعة المنفذ</label>
-                      <select id="lan1Speed">
-                        <option value="Auto">تلقائي (100 Mbps)</option>
-                        <option value="100">100 Mbps ثابت</option>
-                        <option value="10">تحديد 10 Mbps فقط</option>
-                      </select>
-                    </div>
-                    <div class="field">
-                      <label for="lan1Duplex">نمط النقل (Duplex)</label>
-                      <select id="lan1Duplex">
-                        <option value="Auto">تلقائي (Auto)</option>
-                        <option value="Full">Full Duplex</option>
-                        <option value="Half">Half Duplex</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="panel" style="padding:14px">
-                  <label class="check-row" for="lan2Enable" style="margin-bottom:10px">
-                    <span>منفذ LAN 2 (eth0.3)</span>
-                    <input id="lan2Enable" type="checkbox" checked>
-                  </label>
-                  <div class="fields">
-                    <div class="field">
-                      <label for="lan2Speed">تحديد سرعة المنفذ</label>
-                      <select id="lan2Speed">
-                        <option value="Auto">تلقائي (100 Mbps)</option>
-                        <option value="100">100 Mbps ثابت</option>
-                        <option value="10">تحديد 10 Mbps فقط</option>
-                      </select>
-                    </div>
-                    <div class="field">
-                      <label for="lan2Duplex">نمط النقل (Duplex)</label>
-                      <select id="lan2Duplex">
-                        <option value="Auto">تلقائي (Auto)</option>
-                        <option value="Full">Full Duplex</option>
-                        <option value="Half">Half Duplex</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="panel" style="padding:14px">
-                  <label class="check-row" for="lan3Enable" style="margin-bottom:10px">
-                    <span>منفذ LAN 3 (eth0.4)</span>
-                    <input id="lan3Enable" type="checkbox" checked>
-                  </label>
-                  <div class="fields">
-                    <div class="field">
-                      <label for="lan3Speed">تحديد سرعة المنفذ</label>
-                      <select id="lan3Speed">
-                        <option value="Auto">تلقائي (100 Mbps)</option>
-                        <option value="100">100 Mbps ثابت</option>
-                        <option value="10">تحديد 10 Mbps فقط</option>
-                      </select>
-                    </div>
-                    <div class="field">
-                      <label for="lan3Duplex">نمط النقل (Duplex)</label>
-                      <select id="lan3Duplex">
-                        <option value="Auto">تلقائي (Auto)</option>
-                        <option value="Full">Full Duplex</option>
-                        <option value="Half">Half Duplex</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="panel" style="padding:14px">
-                  <label class="check-row" for="lan4Enable" style="margin-bottom:10px">
-                    <span>منفذ LAN 4 (الأدمن)</span>
-                    <input id="lan4Enable" type="checkbox" checked>
-                  </label>
-                  <div class="fields">
-                    <div class="field">
-                      <label for="lan4Speed">تحديد سرعة المنفذ</label>
-                      <select id="lan4Speed">
-                        <option value="Auto">تلقائي (100 Mbps)</option>
-                        <option value="100">100 Mbps ثابت</option>
-                        <option value="10">تحديد 10 Mbps فقط</option>
-                      </select>
-                    </div>
-                    <div class="field">
-                      <label for="lan4Duplex">نمط النقل (Duplex)</label>
-                      <select id="lan4Duplex">
-                        <option value="Auto">تلقائي (Auto)</option>
-                        <option value="Full">Full Duplex</option>
-                        <option value="Half">Half Duplex</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <div class="two-col">
-            <!-- DNS Blocker & DHCP Control -->
-            <section class="panel">
-              <div class="panel-head"><h2>مانع الإعلانات وحجب المواقع والـ DHCP على الراوتر</h2></div>
-              <div class="panel-body fields">
-                <div class="field">
-                  <label for="dnsPreset">فلتر الـ DNS التلقائي لكل الموبايلات المتصلة</label>
-                  <select id="dnsPreset">
-                    <option value="1.1.1.1,1.0.0.1">Cloudflare Fast (1.1.1.1 — أسرع استجابة للألعاب والتصفح)</option>
-                    <option value="94.140.14.14,94.140.15.15">AdGuard DNS (حظر الإعلانات والنوافذ المنبثقة تلقائياً)</option>
-                    <option value="1.1.1.3,1.0.0.3">Cloudflare Family (حجب المواقع الإباحية والضارة تلقائياً)</option>
-                    <option value="8.8.8.8,8.8.4.4">Google Public DNS (8.8.8.8)</option>
-                    <option value="192.168.2.1,192.168.2.1">افتراضي الراوتر (192.168.2.1)</option>
-                  </select>
-                </div>
-                <div class="field">
-                  <label for="customDns">عناوين DNS الموزعة للمتصلين (Primary,Secondary)</label>
-                  <input id="customDns" class="ltr" type="text" value="1.1.1.1,1.0.0.1">
-                </div>
-                <div class="two-col">
-                  <div class="field">
-                    <label for="dhcpStart">بداية توزيع DHCP</label>
-                    <input id="dhcpStart" class="ltr" type="text" value="192.168.2.2">
-                  </div>
-                  <div class="field">
-                    <label for="dhcpEnd">نهاية توزيع DHCP</label>
-                    <input id="dhcpEnd" class="ltr" type="text" value="192.168.2.250">
-                  </div>
-                </div>
-                <div class="two-col">
-                  <div class="field">
-                    <label for="dhcpLease">مدة حجز الـ IP للمتصلين (DHCP Lease)</label>
-                    <select id="dhcpLease">
-                      <option value="3600">ساعة واحدة (3600 ثانية — مثالي للكروت)</option>
-                      <option value="900">15 دقيقة (900 ثانية — دوران سريع)</option>
-                      <option value="21600">6 ساعات</option>
-                      <option value="86400">24 ساعة (86400 ثانية)</option>
-                    </select>
-                  </div>
-                  <div class="field">
-                    <label for="lanMask">قناع الشبكة (Subnet Mask)</label>
-                    <input id="lanMask" class="ltr" type="text" value="255.255.255.0">
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            <!-- 4 Hardware QoS Queues -->
-            <section class="panel">
-              <div class="panel-head"><h2>تقسيم السرعة وطوابير الهاردوير الـ 4 (Hardware QoS Shaping)</h2></div>
-              <div class="panel-body fields">
-                <label class="check-row" for="qosEnable">
-                  <span>تفعيل منظم السرعة ومنع سحب الخط (QueueManagement)</span>
-                  <input id="qosEnable" type="checkbox" checked>
-                </label>
-                <div class="field">
-                  <label for="qosUpKbps">إجمالي سرعة الرفع للخط (Kbps)</label>
-                  <input id="qosUpKbps" class="ltr" type="number" min="256" max="100000" value="4096">
-                </div>
-                <div class="two-col">
-                  <div class="field">
-                    <label for="q1Rate">طابور 1 — الألعاب والصوت (Kbps, 0=مفتوح)</label>
-                    <input id="q1Rate" class="ltr" type="number" min="0" max="100000" value="0">
-                  </div>
-                  <div class="field">
-                    <label for="q2Rate">طابور 2 — الفيديو والتصفح (Kbps)</label>
-                    <input id="q2Rate" class="ltr" type="number" min="0" max="100000" value="0">
-                  </div>
-                </div>
-                <div class="two-col">
-                  <div class="field">
-                    <label for="q3Rate">طابور 3 — شبكات الكروت والضيوف (Kbps)</label>
-                    <input id="q3Rate" class="ltr" type="number" min="0" max="100000" value="2048">
-                  </div>
-                  <div class="field">
-                    <label for="q4Rate">طابور 4 — التحميل والتورنت (Kbps)</label>
-                    <input id="q4Rate" class="ltr" type="number" min="0" max="100000" value="1024">
-                  </div>
-                </div>
-              </div>
-            </section>
-          </div>
-
-          <div class="action-bar">
-            <button class="btn primary" type="button" id="savePortsDnsQosBtn">حفظ وتطبيق منافذ السلك والـ DNS وتقسيم السرعة على الراوتر</button>
-          </div>
-        </div>
-      </section>
+      
 
       <!-- TAB 4: Voucher Management -->
       <section class="page" id="vouchers" role="tabpanel" hidden>
@@ -1164,49 +997,8 @@
               </div>
             </section>
           </div>
-        </div>
-      </section>
+  
 
-      <!-- TAB: Live devices & enforcement -->
-      <section class="page" id="devices" role="tabpanel">
-        <div class="stack">
-          <div class="panel">
-            <div class="panel-head"><h2>محرك الحماية (Enforcement Engine)</h2><span class="badge" id="engState">—</span></div>
-            <div class="panel-body">
-              <dl class="kv">
-                <div><dt>حالة المحرك</dt><dd id="engHeart">—</dd></div>
-                <div><dt>باكتس معالجة / مرفوضة / DNS محوّل للبورتال</dt><dd class="ltr" id="engStats">—</dd></div>
-                <div><dt>جدول وقت النوم</dt><dd id="engSched">—</dd></div>
-              </dl>
-            </div>
-          </div>
-          <div class="panel">
-            <div class="panel-head"><h2>الأجهزة المتصلة (تحديث لحظي)</h2></div>
-            <div class="panel-body" style="padding:0;overflow-x:auto">
-              <table>
-                <thead><tr><th>الجهاز / الكارت</th><th>IP</th><th>MAC</th><th>استهلك (MB)</th><th>اليوم (MB)</th><th>الحالة</th><th>إجراءات</th></tr></thead>
-                <tbody id="devRows"><tr><td colspan="7">—</td></tr></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- TAB: Reports -->
-      <section class="page" id="reports" role="tabpanel">
-        <div class="stack">
-          <div class="panel">
-            <div class="panel-head"><h2>تقارير الاستهلاك اليومية</h2>
-              <button class="btn" type="button" id="exportCsvBtn">تصدير الكروت CSV</button>
-            </div>
-            <div class="panel-body" id="reportsBox">اضغط تحديث لعرض التقارير.</div>
-          </div>
-        </div>
-      </section>
-
-      <!-- TAB: Protection / schedule -->
-      <section class="page" id="protection" role="tabpanel">
-        <div class="stack">
           <div class="panel">
             <div class="panel-head"><h2>جدولة القفل (وقت النوم / وقت الدراسة)</h2></div>
             <div class="panel-body">
@@ -1223,6 +1015,7 @@
               <button class="btn primary full" type="button" id="saveSchBtn" style="margin-top:10px">حفظ الجدولة</button>
             </div>
           </div>
+
           <div class="panel">
             <div class="panel-head"><h2>أدوات</h2></div>
             <div class="panel-body">
@@ -1233,8 +1026,29 @@
               </div>
             </div>
           </div>
+      </div>
+      </section>
+
+      <!-- TAB: Live devices & enforcement -->
+      
+
+      <!-- TAB: Reports -->
+      <section class="page" id="reports" role="tabpanel">
+        <div class="stack">
+          <div class="panel">
+            <div class="panel-head"><h2>تقارير الاستهلاك اليومية</h2>
+              <div style="display:flex;gap:8px">
+                <button class="btn" type="button" id="refreshReportsBtn">تحديث</button>
+                <button class="btn" type="button" id="exportCsvBtn">تصدير الكروت CSV</button>
+              </div>
+            </div>
+            <div class="panel-body" id="reportsBox">اضغط تحديث لعرض التقارير.</div>
+          </div>
         </div>
       </section>
+
+      <!-- TAB: Protection / schedule -->
+      
 
     </main>
   </div>
@@ -1545,8 +1359,8 @@
   }
 
   const $ = id => document.getElementById(id);
-  const val = id => $(id).value.trim();
-  const bool = id => $(id).checked;
+  const val = id => { const el = $(id); return el ? el.value.trim() : ""; };
+  const bool = id => { const el = $(id); return el ? el.checked : false; };
   let baseXmlText = "";
   let toastTimer;
 
@@ -1590,10 +1404,6 @@
     });
   }
   document.querySelectorAll('[data-tab]').forEach(b => b.addEventListener('click', () => go(b.dataset.tab)));
-
-  $('dnsPreset').addEventListener('change', () => {
-    $('customDns').value = $('dnsPreset').value;
-  });
 
   function formatUptime(sec) {
     const s = Number(sec) || 0;
@@ -2046,7 +1856,7 @@
     const portMap = [{ inst: 5, ui: 1 }, { inst: 3, ui: 2 }, { inst: 2, ui: 3 }, { inst: 6, ui: 4 }];
     portMap.forEach(({ inst, ui }) => {
       const mp = xml.match(new RegExp(`<LANEthernetInterfaceConfigInstance InstanceID="${inst}"([^>]*?)>`));
-      if (mp) {
+      if (mp && $(`lan${ui}Enable`)) {
         const a = mp[1];
         const en = (a.match(/Enable="([^"]+)"/) || [])[1] !== "0";
         const spd = (a.match(/X_CfgMaxBitRate="([^"]+)"/) || [])[1] || "Auto";
@@ -2066,32 +1876,32 @@
       const mask = (a.match(/SubnetMask="([^"]+)"/) || [])[1];
       const dns = (a.match(/DNSServers="([^"]+)"/) || [])[1];
       const lease = (a.match(/DHCPLeaseTime="([^"]+)"/) || [])[1];
-      if (minA) $('dhcpStart').value = minA;
-      if (maxA) $('dhcpEnd').value = maxA;
-      if (mask) $('lanMask').value = mask;
-      if (dns) $('customDns').value = dns;
-      if (lease) $('dhcpLease').value = lease;
+      if (minA && $('dhcpStart')) $('dhcpStart').value = minA;
+      if (maxA && $('dhcpEnd')) $('dhcpEnd').value = maxA;
+      if (mask && $('lanMask')) $('lanMask').value = mask;
+      if (dns && $('customDns')) $('customDns').value = dns;
+      if (lease && $('dhcpLease')) $('dhcpLease').value = lease;
     }
 
     // QoS & Conntrack
     const mQos = xml.match(/<QueueManagement Enable="([^"]*)" X_BandWidth="([^"]*)"[^>]*X_ConntrackMax="([^"]*)"/);
-    if (mQos) {
+    if (mQos && $('qosEnable')) {
       $('qosEnable').checked = (mQos[1] === "1");
       if (mQos[2] && mQos[2] !== "0") $('qosUpKbps').value = mQos[2];
       if (mQos[3] && mQos[3] !== "0") $('conntrackMax').value = mQos[3];
     }
     for (let q = 1; q <= 4; q++) {
       const mq = xml.match(new RegExp(`<QueueInstance InstanceID="${q}"[^>]*ShapingRate="(\\d+)"`));
-      if (mq) $(`q${q}Rate`).value = Math.round(Number(mq[1]) / 1000) || 0;
+      if (mq && $(`q${q}Rate`)) $(`q${q}Rate`).value = Math.round(Number(mq[1]) / 1000) || 0;
     }
 
     // Firewall, LED, DMZ
     const mFw = xml.match(/<X_FireWall CurrentLevel="([^"]+)">/);
-    if (mFw) $('firewallLevel').value = mFw[1];
+    if (mFw && $('firewallLevel')) $('firewallLevel').value = mFw[1];
     const mLed = xml.match(/<X_LEDDiagnostics Results="([^"]+)"\/>/);
-    if (mLed) $('ledControl').value = mLed[1];
+    if (mLed && $('ledControl')) $('ledControl').value = mLed[1];
     const mDmz = xml.match(/<X_DMZ DMZEnable="1" DMZHostIPAddress="([^"]+)"\/>/);
-    if (mDmz) $('dmzIp').value = mDmz[1];
+    if (mDmz && $('dmzIp')) $('dmzIp').value = mDmz[1];
   }
 
   function updateWlanBlock(xml, instId, en, ssid, pass, maxC, rateVal, iso, adv, chVal, bwVal, pwrVal, sgiVal, dtimVal, bcnVal, rtsVal, wmmVal) {
@@ -2261,13 +2071,13 @@
         $('connBadge').textContent = "متصل بالراوتر";
         $('connBadge').className = "badge online";
         const dev = data.deviceInfo || {};
-        $('stModel').textContent = `${dev.DeviceName || "HG630 V2"} (BCM6318)`;
+        $('stModel').textContent = `${dev.DeviceName || "HG630 V2"} (HiSilicon SD5610)`;
         $('stSerial').textContent = dev.SerialNumber || "T5D7S18716905359";
         $('stSw').textContent = dev.SoftwareVersion || "V100R001C36B023";
         $('stHw').textContent = dev.HardwareVersion || "VER.B";
         $('stMac').textContent = dev.WanMacaddr || "8C:15:C7:EB:BF:2F";
         $('stUptime').textContent = formatUptime(dev.UpTime);
-        $('topIdentityMeta').textContent = `192.168.2.1 | ${dev.SoftwareVersion || 'V100R001C36B023'} | ${dev.SerialNumber || ''}`;
+        $('topIdentityMeta').textContent = `192.168.2.254 | ${dev.SoftwareVersion || 'V100R001C36B023'} | ${dev.SerialNumber || ''}`;
 
         const hosts = Array.isArray(data.hosts) ? data.hosts : (data.hosts ? [data.hosts] : []);
         const activeHosts = hosts.filter(h => h && h.IPAddress);
@@ -2279,7 +2089,7 @@
         } else {
           tbody.innerHTML = activeHosts.map(h => {
             const name = h.ActualName || h.HostName || "جهاز متصل";
-            const ip = (h.IPAddress === "192.168.2.10") ? "192.168.2.10 (جهاز الأدمن)" : h.IPAddress;
+            const ip = (h.IPAddress === "192.168.2.1") ? "192.168.2.1 (جهاز الأدمن - البوابة)" : h.IPAddress;
             const mac = (h.MACAddress || "").toUpperCase();
             let iface = h.Layer2Interface || "LAN";
             if (iface === "SSID1") iface = "الشبكة 1 (الأساسية)";
@@ -2351,7 +2161,6 @@
   }
 
   $('saveWifiBtn').addEventListener('click', function() { saveAndPushToRouter(this); });
-  $('savePortsDnsQosBtn').addEventListener('click', function() { saveAndPushToRouter(this); });
   $('saveNetBtn').addEventListener('click', function() { saveAndPushToRouter(this); });
   $('refreshBtn').addEventListener('click', () => { loadDb(); refreshLiveStatus(true); });
   $('refreshHostsBtn').addEventListener('click', () => refreshLiveStatus(true));
@@ -2546,6 +2355,23 @@
       });
       $('devRows').innerHTML = rows.length ? rows.join('') : '<tr><td colspan="7">لا يوجد أجهزة متصلة</td></tr>';
 
+      // banner + readiness
+      const banner = document.getElementById('engBanner');
+      if (banner) banner.classList.toggle('hidden', online);
+      const rr = document.getElementById('readyRouter');
+      const re2 = document.getElementById('readyEngine');
+      if (rr) { rr.innerHTML = '<span class="badge online">شغال</span>'; }
+      if (re2) { re2.innerHTML = online ? '<span class="badge online">شغال</span>' : '<span class="badge offline">واقف</span>'; }
+      try {
+        const lv = await (await fetch(BRIDGE + '/api/live-status', { cache: 'no-store' })).json();
+        const rg = document.getElementById('readyGateway');
+        if (rg) {
+          const gw = lv && lv.gateway ? lv.gateway : null;
+          const okGw = gw && gw.ics === 'Running' && (gw.ethIps || '').includes('192.168.2.1');
+          rg.innerHTML = okGw ? '<span class="badge online">شغالة</span>' : '<span class="badge offline">مش مظبوطة — شغل Setup_Gateway_Nat.ps1</span>';
+        }
+      } catch (e2) {}
+
       $('schEnabled').checked = !!sc.enabled;
       $('schStart').value = sc.start || '00:00';
       $('schEnd').value = sc.end || '08:00';
@@ -2592,6 +2418,11 @@
     a.download = 'vouchers.csv';
     a.click();
   };
+
+  const repBtn = document.querySelector('[data-tab="reports"]');
+  if (repBtn) repBtn.addEventListener('click', loadReports);
+  const rr2 = document.getElementById('refreshReportsBtn');
+  if (rr2) rr2.onclick = loadReports;
 
   loadEngine();
   setInterval(() => { loadEngine(); }, 8000);

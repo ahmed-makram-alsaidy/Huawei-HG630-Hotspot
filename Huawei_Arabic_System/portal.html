@@ -342,7 +342,30 @@
       }
     };
 
+    // ---- resume active session on revisit ----
+    async function resumeIfConnected() {
+      try {
+        const r = await fetch(`${API}/api/portal-status`, { cache: 'no-store' });
+        const d = await r.json();
+        const s = d.session;
+        if (s && s.auth && !s.cut) {
+          $('loginForm').classList.add('hidden');
+          $('modeSwitch').classList.add('hidden');
+          $('statusBox').classList.remove('hidden');
+          $('stTitle').textContent = `أنت متصل بالفعل (${s.name || 'جلسة نشطة'})`;
+          $('stPkg').textContent = s.package || '—';
+          if (s.speedDownKbps) {
+            $('stSpeed').textContent = `${(s.speedDownKbps/1024).toFixed(1)} Mbps ↓ / ${(s.speedUpKbps/1024).toFixed(1)} Mbps ↑`;
+          }
+          $('stQuota').textContent = s.quotaGB > 0 ? `${s.quotaGB} GB (مستهلك: ${s.usedMB || 0} MB)` : 'مفتوح بدون حد';
+          $('stExp').textContent = s.expiresAt ? ('حتى ' + s.expiresAt.replace('T', ' ').slice(0, 16)) : 'ساري';
+          startPolling();
+        }
+      } catch {}
+    }
+
     loadPortalInfo();
+    resumeIfConnected();
   </script>
 </body>
 </html>
